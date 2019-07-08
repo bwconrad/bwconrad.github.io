@@ -8,6 +8,7 @@ td {
   font-size: 18px
 }
 </style>
+
 > *The following was work I did during my NSERC Undergraduate Research Assistant position at Simon Fraser University during Summer 2018. The report assumes the reader has prior knowledge about knowledge representation particularly descriptive logics.*
 
 
