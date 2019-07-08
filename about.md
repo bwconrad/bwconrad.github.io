@@ -1,18 +1,34 @@
 ---
+<<<<<<< HEAD
+layout: default
+title: About
+---
+<!--
+## About {{ site.name }}
+-->
+
+<img class="user-avatar" src="{{ site.owner.avatar }}">
+
+BSc Computer Science from Simon Fraser University. Former NSERC Undergraduate Research Assistant at Simon Fraser University. 
+
+Currently researching generative models and computer vision.
+
+<div class="pagination">
+  {% if site.owner.linkedin %}
+    <a href="{{ site.owner.linkedin }}" class="social-media-icons"><i class="fa fa-2x fa-linkedin-square" aria-hidden="true"></i></a>
+  {% endif %}
+  {% if site.owner.email %}
+    <a href="mailto:{{ site.owner.email }}" class="social-media-icons"><i class="fa fa-2x fa-envelope-square" aria-hidden="true"></i></a>
+  {% endif %}
+  {% if site.owner.twitter %}
+    <a href="https://twitter.com/{{ site.owner.twitter }}" class="social-media-icons"><i class="fa fa-2x fa-twitter-square" aria-hidden="true"></i></a>
+  {% endif %}
+  {% if site.owner.github %}
+    <a href="{{ site.owner.github }}" class="social-media-icons"><i class="fa fa-2x fa-github-square" aria-hidden="true"></i></a>
+  {% endif %}
+</div>
+=======
 layout: page
 title: About
 permalink: /about/
----
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
-
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
-
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
