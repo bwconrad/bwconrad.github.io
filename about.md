@@ -1,11 +1,7 @@
 ---
-<<<<<<< HEAD
 layout: default
-title: About
+title: Ben Conrad
 ---
-<!--
-## About {{ site.name }}
--->
 
 <img class="user-avatar" src="{{ site.owner.avatar }}">
 
@@ -27,8 +23,5 @@ Currently researching generative models and computer vision.
     <a href="{{ site.owner.github }}" class="social-media-icons"><i class="fa fa-2x fa-github-square" aria-hidden="true"></i></a>
   {% endif %}
 </div>
-=======
-layout: page
-title: About
-permalink: /about/
+
 
