@@ -8,6 +8,8 @@ td {
   font-size: 18px
 }
 </style>
+> *The following was work I did during my NSERC Undergraduate Research Assistant position at Simon Fraser University during Summer 2018. The report assumes the reader has prior knowledge about knowledge representation particularly descriptive logics.*
+
 
 The field of knowledge representation deals with finding efficient methods to represent, store and perform inference on large collections of data. When dealing with large knowledge bases, a user may require to remove a fact that was previously believed to be true however has been rendered false after the addition of new information. What makes this operation difficult is that simply removing the belief  (represented as a formal logic axiom) is often not enough since the combinations of many other beliefs in the knowledge base can also infer the same false fact resulting in no knowledge actually being removed. Various contraction methods working on different formal logics have been proposed which ensures that a belief is completely forgotten by removing multiple axioms from a knowledge base. In [Dawood17], a kernel contraction algorithm was constructed for $\mathcal{EL}$ TBox. The contraction is performed by removing a minimum set of axioms which infer the belief and using a heuristic to select the a prefered set when multiple minimum sets exist. One of these heuristics is _Specificity_ which weighs axioms by their generality within the domain. We will be expanding upon the Specificity heuristic to create a total preorder relation that orders axioms based on the amount of epistemic loss that they cause when removed from a TBox. The **Hierarchical Total Preorder**, will work on $\mathcal{EL^{++}}$ TBoxes and will be shown how it can be implemented into the kernel contraction algorithm.
 
@@ -31,9 +33,6 @@ $\mathcal{EL^{++}}$ [Baader05], an extension of $\mathcal{EL}$, is a lightweight
 |GCI | $C \sqsubseteq D$ | $C^I \sqsubseteq D^I$ |
 |RI | $r_1 \circ ... \circ r_k \sqsubseteq r$ | $r_1^I \circ ... \circ r_k^I \sqsubseteq r^I$
 
-
-
-------------------------------------------------------------------------
 
 An $\mathcal{EL^{++}}$ TBox is a finite and consistent set of GCIs and RIs. We refer to the left hand side expression as the *sub-concept* or *sub-role* and the right hand side expression as the *super-concept* or *super-role* for GCIs and RIs respectively.
 
