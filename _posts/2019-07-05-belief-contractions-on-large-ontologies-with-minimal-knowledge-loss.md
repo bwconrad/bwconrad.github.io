@@ -12,15 +12,15 @@ td {
 > *The following was work I did during my NSERC Undergraduate Research Assistant position at Simon Fraser University during Summer 2018. The report assumes the reader has prior knowledge about knowledge representation particularly descriptive logics.*
 
 
-The field of knowledge representation deals with finding efficient methods to represent, store and perform inference on large collections of data. When dealing with large knowledge bases, a user may require to remove a fact that was previously believed to be true however has been rendered false after the addition of new information. What makes this operation difficult is that simply removing the belief  (represented as a formal logic axiom) is often not enough since the combinations of many other beliefs in the knowledge base can also infer the same false fact resulting in no knowledge actually being removed. Various contraction methods working on different formal logics have been proposed which ensures that a belief is completely forgotten by removing multiple axioms from a knowledge base. In [Dawood17], a kernel contraction algorithm was constructed for $\mathcal{EL}$ TBox. The contraction is performed by removing a minimum set of axioms which infer the belief and using a heuristic to select the a prefered set when multiple minimum sets exist. One of these heuristics is _Specificity_ which weighs axioms by their generality within the domain. We will be expanding upon the Specificity heuristic to create a total preorder relation that orders axioms based on the amount of epistemic loss that they cause when removed from a TBox. The **Hierarchical Total Preorder**, will work on $\mathcal{EL^{++}}$ TBoxes and will be shown how it can be implemented into the kernel contraction algorithm.
+The field of knowledge representation deals with finding efficient methods to represent, store and perform inference on large collections of data. When dealing with large knowledge bases, a user may require to remove a fact that was previously believed to be true however has been rendered false after the addition of new information. What makes this operation difficult is that simply removing the belief  (represented as a formal logic axiom) is often not enough since the combinations of many other beliefs in the knowledge base can also infer the same false fact resulting in no knowledge actually being removed. Various contraction methods working on different formal logics have been proposed which ensures that a belief is completely forgotten by removing multiple axioms from a knowledge base. In [[Dawood17](#Dawood17)], a kernel contraction algorithm was constructed for $\mathcal{EL}$ TBox. The contraction is performed by removing a minimum set of axioms which infer the belief and using a heuristic to select the a prefered set when multiple minimum sets exist. One of these heuristics is _Specificity_ which weighs axioms by their generality within the domain. We will be expanding upon the Specificity heuristic to create a total preorder relation that orders axioms based on the amount of epistemic loss that they cause when removed from a TBox. The **Hierarchical Total Preorder**, will work on $\mathcal{EL^{++}}$ TBoxes and will be shown how it can be implemented into the kernel contraction algorithm.
 
 
 $\mathcal{EL^{++}}$ Description Logic
 -------------------------------------
 
-Description Logics (DLs) [BaaderEtAl07] are a family of logics used to model relationships between entities in a domain. DLs consist of three types of entities, concepts which represent sets of individuals, roles which describe relationships between individuals and singleton individuals from a domain. A DL knowledge base is composed of two parts, the ABox containing extensional knowledge and the TBox containing intensional knowledge. The ABox states assertions about individuals using concepts and roles such as $Doctor(Betty)$ and $brotherOf(Tim, Jill)$. The TBox contains subsumption axioms that describe relationships between concepts and roles such $Dog \sqsubseteq Animal$ and $brotherOf \sqsubseteq parentOf$. Many DLs exist with varying expressibility and reasoning complexity. The language that we will be using is $\mathcal{EL^{++}}$.
+Description Logics (DLs) [[Baader07](#Baader07)] are a family of logics used to model relationships between entities in a domain. DLs consist of three types of entities, concepts which represent sets of individuals, roles which describe relationships between individuals and singleton individuals from a domain. A DL knowledge base is composed of two parts, the ABox containing extensional knowledge and the TBox containing intensional knowledge. The ABox states assertions about individuals using concepts and roles such as $Doctor(Betty)$ and $brotherOf(Tim, Jill)$. The TBox contains subsumption axioms that describe relationships between concepts and roles such $Dog \sqsubseteq Animal$ and $brotherOf \sqsubseteq parentOf$. Many DLs exist with varying expressibility and reasoning complexity. The language that we will be using is $\mathcal{EL^{++}}$.
 
-$\mathcal{EL^{++}}$ [Baader05], an extension of $\mathcal{EL}$, is a lightweight DL that has limited expressibility but boasts polynomial time reasoning and is used on large ontologies like SNOMED CT. The table below outlines the syntax of the language.
+$\mathcal{EL^{++}}$ [[Baader05](#Baader05)], an extension of $\mathcal{EL}$, is a lightweight DL that has limited expressibility but boasts polynomial time reasoning and is used on large ontologies like SNOMED CT. The table below outlines the syntax of the language.
 
 
 |**Name**|**Syntax**|**Semantics**|
@@ -40,7 +40,7 @@ An $\mathcal{EL^{++}}$ TBox is a finite and consistent set of GCIs and RIs. We r
 Belief Change
 -------------
 
-The most prominently used construction of belief change is the AGM framework [AGM85]. The framework models an agent’s state of knowledge with a belief set which is a closed under logical implication set of sentences. Belief sets state exactly what the agent currently perceives as true. There are three belief change operations for modifying these sets:
+The most prominently used construction of belief change is the AGM framework [[Alchourron85](#Alchourron85)]. The framework models an agent’s state of knowledge with a belief set which is a closed under logical implication set of sentences. Belief sets state exactly what the agent currently perceives as true. There are three belief change operations for modifying these sets:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **Expansion:** Adding a new belief to a belief set.
 
@@ -50,11 +50,11 @@ The most prominently used construction of belief change is the AGM framework [AG
 
 The operation we will be focusing on is contraction.
 
-While AGM describes contractions using belief sets, [Hansson93] describes a different approach using belief bases. Belief bases are sets of beliefs not closed under logical implication which better models what an agent with finite memory would store and are equivalent to DL TBoxes.
+While AGM describes contractions using belief sets, [[Hansson93](#Hansson93)] describes a different approach using belief bases. Belief bases are sets of beliefs not closed under logical implication which better models what an agent with finite memory would store and are equivalent to DL TBoxes.
 
-Two methods of belief base contractions are regularly used, partial meet contractions and kernel contractions. Partial meet contractions [AGM85] are done by using remainder sets, maximal subsets of a belief base $K$ that do not entail the axiom we wish to contract, $\alpha$. The contracted belief base is the intersection of a select set of remainder sets. Kernels [Hansson94] are minimal subsets of $K$ that entail $\alpha$. To perform a kernel contraction of $\alpha$ we select an axiom from each kernel and remove them from the belief base. Kernel contraction is the method that we will be considering from now on and is denoted by $K \div \alpha$.
+Two methods of belief base contractions are regularly used, partial meet contractions and kernel contractions. Partial meet contractions [[Alchourron85](#Alchourron85)] are done by using remainder sets, maximal subsets of a belief base $K$ that do not entail the axiom we wish to contract, $\alpha$. The contracted belief base is the intersection of a select set of remainder sets. Kernels [[Hansson94](#Hansson94)] are minimal subsets of $K$ that entail $\alpha$. To perform a kernel contraction of $\alpha$ we select an axiom from each kernel and remove them from the belief base. Kernel contraction is the method that we will be considering from now on and is denoted by $K \div \alpha$.
 
-The following five postulates [Hansson93] are used to capture the definition of a belief base kernel contraction:
+The following five postulates [[Hansson93](#Hansson93)] are used to capture the definition of a belief base kernel contraction:
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**1) Success**: If $\nvdash \alpha$ then $K\div\alpha \nvdash \alpha$
 
@@ -69,14 +69,14 @@ The following five postulates [Hansson93] are used to capture the definition of 
 If a function satisfies the first four postulates then it is a kernel contraction and if all five hold then it is a smooth kernel
 contraction.
 
-The kernel contraction algorithm that we will be working was introduced in [Dawood17]. The algorithm calculates all $\alpha$-kernels, kernels that entail $\alpha$, in $K$ using the axiom pinpointing algorithm [Baa08]. We denote the set of $\alpha$-kernels in belief base $K$ with $K \perp \alpha$. An incision function then selects axioms from each kernel to remove from the belief base. The set of axioms chosen by the incision function is called the *drop set*, $\sigma(K \perp\alpha)$. Since we prefer to remove as few axioms as possible, the incision function selects a minimum drop set. The calculation for minimum drop sets is equivalent to the minimum hitting set problem [Garey79, Dawood17] therefore a hitting set algorithm is used to find drop sets. Once a minimum hitting set is selected for the drop set, the axioms are removed to form the contracted belief base, $K \div \alpha$.
+The kernel contraction algorithm that we will be working was introduced in [[Dawood17](#Dawood17)]. The algorithm calculates all $\alpha$-kernels, kernels that entail $\alpha$, in $K$ using the axiom pinpointing algorithm [[Baader08](#Baader08)]. We denote the set of $\alpha$-kernels in belief base $K$ with $K \perp \alpha$. An incision function then selects axioms from each kernel to remove from the belief base. The set of axioms chosen by the incision function is called the *drop set*, $\sigma(K \perp\alpha)$. Since we prefer to remove as few axioms as possible, the incision function selects a minimum drop set. The calculation for minimum drop sets is equivalent to the minimum hitting set problem [[Garey79](#Garey79), [Dawood17](#Dawood17)] therefore a hitting set algorithm is used to find drop sets. Once a minimum hitting set is selected for the drop set, the axioms are removed to form the contracted belief base, $K \div \alpha$.
 
 Hierarchical Total Preorder
 ---------------------------
 
-Since an $\mathcal{EL^{++}}$ TBox is equivalent to a belief base we can use the kernel contraction $T\div\alpha$ on some $\mathcal{EL^{++}}$ TBox $T$ and axiom $\alpha$. Once the kernels are calculated and the minimum hitting sets are found we typically have multiple equal sized sets to choose as the drop set. Aside from simply removing as few axioms as possible, we ideally want to achieve the contraction with as minimal knowledge loss to the TBox as possible. Expanding on the specificity heuristic from [Dawood17] and exploiting the axiom hierarchy found in $\mathcal{EL^{++}}$, we can define a total preorder binary relation which can order axioms by their importance within the TBox to help make our decision.
+Since an $\mathcal{EL^{++}}$ TBox is equivalent to a belief base we can use the kernel contraction $T\div\alpha$ on some $\mathcal{EL^{++}}$ TBox $T$ and axiom $\alpha$. Once the kernels are calculated and the minimum hitting sets are found we typically have multiple equal sized sets to choose as the drop set. Aside from simply removing as few axioms as possible, we ideally want to achieve the contraction with as minimal knowledge loss to the TBox as possible. Expanding on the specificity heuristic from [[Dawood17](#Dawood17)] and exploiting the axiom hierarchy found in $\mathcal{EL^{++}}$, we can define a total preorder binary relation which can order axioms by their importance within the TBox to help make our decision.
 
-The hierarchical preorder relation, $\le_{HP}$, is based off the concept of an epistemic entrenchment [Gardenfors88], $\le_{EE}$. An epistemic entrenchment is a total preorder over the axioms of a belief set that represents the relative epistemic loss caused by removing each axiom. The relation $\alpha \le_{EE} \beta$ states that $\beta$ is equally or more entrenched in the knowledge base as $\alpha$ and therefore during contractions we would prefer to remove $\alpha$ over $\beta$. An epistemic entrenchment is defined by five postulates, transitivity, dominance, conjunctiveness, minimality and maximality. These postulates capture the definition of epistemic loss in standard logics however not all postulates can be applied to description logics.
+The hierarchical preorder relation, $\le_{HP}$, is based off the concept of an epistemic entrenchment [[Gardenfors88](#Gardenfors88)], $\le_{EE}$. An epistemic entrenchment is a total preorder over the axioms of a belief set that represents the relative epistemic loss caused by removing each axiom. The relation $\alpha \le_{EE} \beta$ states that $\beta$ is equally or more entrenched in the knowledge base as $\alpha$ and therefore during contractions we would prefer to remove $\alpha$ over $\beta$. An epistemic entrenchment is defined by five postulates, transitivity, dominance, conjunctiveness, minimality and maximality. These postulates capture the definition of epistemic loss in standard logics however not all postulates can be applied to description logics.
 
 For the hierarchical preorder, we will form a new set of postulates to formulate a preorder that still uses the metric of epistemic loss to order the axioms but can applied on $\mathcal{EL^{++}}$ TBoxes. In $\mathcal{EL^{++}}$ we can measure epistemic loss as the number of entailments related to the most general expression that are lost. For example, in the TBox $\; T =${$A \sqsubseteq B,\; B \sqsubseteq C, \; C \sqsubseteq D$}, removing $C \sqsubseteq D$ results in losing the entailments $A \sqsubseteq D, \; B \sqsubseteq D$ and $C \sqsubseteq D$, however removing $A \sqsubseteq B$ only loses the entailment $A \sqsubseteq D$. Since removing $A \sqsubseteq B$ causes less epistemic loss we have $A \sqsubseteq B \le_{HP} C \sqsubseteq D$.
 
@@ -346,7 +346,7 @@ We will now show that $T\div\alpha$ is a smooth kernel contraction by proving th
 
 **Core Retainment:** Assume $\beta \in T$ and $\beta \notin T\div\alpha$. That means $\beta \in \sigma(T \perp \alpha)$. Set $T'=T-\alpha$ which means $T' \subseteq T$ and $T' \nvdash \alpha$. If we add $\beta$ to $T'$ then at least one $\alpha$-kernel exists in $T' \cup \beta$ since $\beta$ is in a minimal hitting set of the kernels. Therefore $T' \cup \beta \vdash \alpha$.
 
-**Uniformity:** Assume for every $T' \subseteq T$, we have $T' \vdash \alpha$ iff $T' \vdash \beta$. In [Hansson94], it is explained that our assumption is equivalent to $T \perp \alpha = T \perp \beta$. When the incision function is run on
+**Uniformity:** Assume for every $T' \subseteq T$, we have $T' \vdash \alpha$ iff $T' \vdash \beta$. In [[Hansson94](#Hansson94)], it is explained that our assumption is equivalent to $T \perp \alpha = T \perp \beta$. When the incision function is run on
 $T \perp \alpha$ and $T \perp \beta$, the same set of hitting sets will be calculated and since the preorder using
 $\le_{HPS}$ is unique (assuming $<_*$ exists), $\sigma(T \perp \alpha) = \sigma(T \perp \beta)$ and therefore $T\div\alpha = T\div\beta$.
 
@@ -364,3 +364,45 @@ The hierarchical total preorder relation is a versatile method for ordering axio
 
 This hierarchical approach is simply one way of ordering axioms. Future work can be done into developing new preorders or epistemic entrenchments that use different approaches to weighting axioms that work better under certain contexts. An issue with the hierarchical weighting function currently is that after every contraction, the entire TBox needs to be re-weighted in order to update the preorder. Developing a way to adjust weights after a contraction is an avenue to explore
 further. Finally, though the preorder was construction for $\mathcal{EL^{++}}$ TBoxes, it would be interesting to see if the method can be expanded to work with more expressive descriptions logics like the $\mathcal{ALC}$ family.
+
+
+References
+----------
+<a name='Alchourron85'></a>[Alchourron85] Alchourrón, C., Gärdenfors, P., and Makinson, D.
+(1985). On the logic of theory change: Partial meet contraction and revi-
+sion functions. 50(2):510–530.
+
+<a name='Baader05'></a>[Baader05] Baader, F., Brandt, S., and Lutz, C. (2005). Pushing the
+EL envelope. In Proceedings of the Nineteenth International Joint Confer-
+ence on Artificial Intelligence IJCAI-05, Edinburgh, UK. Morgan-Kaufmann
+Publishers.
+
+<a name='Baader07'></a>[Baader07] Baader, F., Calvanese, D., McGuiness, D., Nardi, D., and
+Patel-Schneider, P., editors (2007). The Description Logic Handbook. Cam-
+bridge University Press, Cambridge, second edition.
+
+<a name='Baader08'></a>[Baader08] Baader, F. and Suntisrivaraporn, B.
+(2008). Debugging SNOMED CT using axiom pinpointing in the description
+logic EL+ . In Proceedings of the 3rd Knowledge Representation in Medicine
+(KR-MED’08): Representing and Sharing Knowledge Using SNOMED, vol-
+ume 410 of CEUR-WS.
+
+<a name='Dawood17'></a>[Dawood17] Dawood, A., Delgrande, J., and Liao, Z. (2017). A study
+of kernel contraction in EL. In Gordon, A., Miller, R., and Turan, G., editors,
+Thirteenth International Symposium on Logical Formalizations of Common-
+sense Reasoning, London, UK. (7 double-column AAAI-style pages).
+
+<a name='Gardenfors88'></a>[Gardenfors88] Gärdenfors, P. and Makinson, D. (1988). Re-
+visions of knowledge systems using epistemic entrenchment. In Proceedings
+of the 2Nd Conference on Theoretical Aspects of Reasoning About Knowl-
+edge, TARK ’88, pages 83–95, San Francisco, CA, USA. Morgan Kaufmann
+Publishers Inc.
+
+<a name='Garey79'></a>[Garey79] Garey, M. and Johnson, D. (1979). Computers and
+Intractability: A Guide to the Theory of NP-Completeness. W.H. Freeman
+and Co., New York.
+
+<a name='Hansson93'></a>[Hansson93] Hansson, S. O. (1993). Reversing the levi identity. 22(6):637–
+669.
+
+<a name='Hansson94'></a>[Hansson94] Hansson, S. O. (1994). Kernel contraction. 59(3):845–859.
