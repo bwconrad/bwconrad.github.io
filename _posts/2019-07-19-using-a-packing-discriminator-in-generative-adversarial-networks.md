@@ -1,0 +1,70 @@
+---
+layout: post
+title: Using a Packing Discriminator in Generative Adversarial Networks
+date: 2019-07-19 10:09 -0700
+---
+
+<style>
+td {
+  font-size: 18px
+}
+</style>
+
+Generative Adversarial Networks (GANs) [1] are generative models used to produce samples a complex target distribution. GANs have seen great success in producing realistic sampes from many different domains however they commonly have an issue where they begin to produce samples with very little diversity. THis problem is referred to as mode collasp and a significant amount of work has been put into techniques to alleviate this issue. One of these proposed techniques is a simple extension to the discriminator architecture that gets the network to discriminates against multiple samples jointly referred to as packing [2].
+
+In this paper we perform an empirical analysis on packing to better understand its effects on GAN training. We test packing architectures on a synthetic datasets under different settings to understand if packing can decrease mode collapse and if it help stabalize training over the orginal GAN architecture. 
+
+## Preliminaries
+### Mode Collapse in GANs:
+
+Mode collapse is a phenomenon in GAN training where generated samples lack the same diversity as the target distribution. More specifically in the unsupervised learning case, it is when the latent space fails to encode all modes in the target multimodal distribution. Mode collapse occurs when the generator learns that certain generated samples have a high probability of fooling the discriminator and instead of exploring the rest of the output domain for more modes it continues to produce similar samples to minimize its loss.
+
+An examples of this phenomenon happens while training a GAN on the MNIST dataset which contains 10 modes, the digits 0 to 9. Using a regular GAN architexcture, the network often fails to generate some of the digits, only discovering a few of the distribution's modes no matter how long the network trains.
+
+Several approaches have been used to deal with mode collapse. Some of these approaches include modifying the network architecture, using different loss functions, mixing multiple GANs together and, similiarly to packing, change how the discriminator validates samples. While many of these techniques have shown to alleviate model collaps, these is little understanding on why some of techinques work and which are suitable for certain cases.
+
+### Packing:
+
+Packing is an extension to the original GAN architecture where the discriminator labels multiple samples jointly to a single label. The network framework keeps the same generator architecture and loss function but changes the discriminator from mapping a single input $x$ to a binary label, $D:x \rightarrow \\{ 0,1 \\}$, into a packing discriminator which jointly maps $m$ inputs  $x_1, x_2, ..., x_m$ to a single joint label, $D:x_1, x_2, ..., x_m \rightarrow \\{ 0,1 \\}$. We refer to $m$ as the degree of packing and we draw the $m$ samples from independantly from the real distribution $P$ and the generator distributin $Q$.
+
+In a standard GAN, the network can be thought as learning a distribution $Q$ which minimizes the distance between distributions itself and the real distribution $P$, $\min d(P,Q)$. When using packing, this optimization problem changes as the discriminator is given samples from the product distribution of degree $m$ making the new problem $
+\min d(P^m, Q^m)$. Exposing the discriminator to the product distribution allows for it to better detect the presence of diversity (or lack there of) in generated examples pushing the generator to explore a wider area of the output's domain and avoid mode collapse.
+
+Packing introduces very little additional computation, going from $\mathcal{O}(wrg^2)$ per minibatch update in a standard GAN to $\mathcal{O}((w+m)rg^2)$ in a GAN using a packing discriminator of degree $m$ where $w$ is the number of fully connected layers, $g$ is the number of nodes per layer and $r$ is the minibatch size [2].
+
+## Experiments
+### Setup
+
+To analyze the effects of using a packing discriminator, we compare networks with and without the use of packing across different variations of our baseline dataset. The dataset is a 2-dimensional multivariate Gaussian distribution $\mathcal{N}(\mu, \Sigma)$ with 25 means at $(-4+2i, -4+2j)$ for $i,j \in \\{0,1,2,3,4\\}$, each with $\Sigma=0.0025 \cdot \mathcal{I}$ (seen in Figure 1). Experiments are performed on alterations of the baseline dateset with different varience and mode concentration and arrangements.
+
+All of the networks use the same generator and discriminator architectures which can be seen in the Table 1.
+
+| Generator | Discriminator |
+|-----------|---------------|
+| $z \in \mathcal{R}^{2} \sim \mathcal{N}(0, \mathcal{I})$ | $x \in \mathcal{R}^{2 \cdot m}$|
+| $Linear(2 \rightarrow 400)$, BN, ReLU | $Linear(2 \cdot m \rightarrow 200)$, LinearMaxOut(5) |
+| $Linear(400 \rightarrow 400)$, BN, ReLU | $Linear(200 \rightarrow 200)$, LinearMaxOut(5)|
+| $Linear(400 \rightarrow 400)$, BN, ReLU | $Linear(200 \rightarrow 200)$, LinearMaxOut(5)|
+| $Linear(400 \rightarrow 400)$, BN, ReLU | $Linear(200 \rightarrow 1)$, Sigmoid |
+| $Linear(400 \rightarrow 2)$, BN, ReLU | |
+
+<p align="center"> <b>Table 1</b></p>
+
+The discriminator's activation function is  LinearMaxout [3] with 5 maxout units. The generator and discriminator both use the standard GAN loss function from [1]. The synthetic training dataset has 100,000 samples that the networks are trained on for 100 epochs using Adam [4] with equal updates on both the gnerator and discriminator . All other parameters can be found in Table 2.
+
+| lr = 0.0001 |
+| beta1 = 0.8 |
+| beta2 = 0.999|
+| minibatch size = 100 |
+
+<p align="center"> <b>Table 2</b></p>
+
+The primary metric of concern for the experiments is the number of modes that the generator learns. For multivariate Gaussian distributions, modes exist at each mean and we consider that a mode is lost if no sample within 3 standard deviations of the center of a mode is generated. Other metrics measured are the number of epochs it takes the network to learn all of the modes, the '% high quality samples' which is the proportion of generated samples within 3 standard deviations of a mode and the Jensen-Shannon divergence (JSD) between the target and learned distributions. All metrics are calculated from 2500 samples generated after each epoch.
+
+The dataset, hyper-parameters and metrics closely follow those from the 2D-grid experiment in [2].
+
+### Results
+
+The first set of experiments examine the effects of packing on data with various levels of noise which is simulated by increasing the variance of our baseline target distribution. On the noise-free baseline distibution (Figure 1 and Table 3), the network is only capable of generating 19 of the target distribution's modes when using a standard discriminator however by adding packing the network learns all 25 modes at $m=25$. Adding noise to the distribution decreases the severity of mode collapse on the standard GAN recovering 23 modes when $\Sigma=0.01 \cdot \mathcal{I}$ (Figure 2 and Table 4) and all 25 when $\Sigma=0.1 \cdot \mathcal{I}$ (Figure 3 and Table 5). Apply noise to the inputs of the discriminator is a technique is a technique explored before [https://arxiv.org/pdf/1606.03498.pdf, 5] and is explain to help smooth the distribution's probability mass making it easier for the generator become stuck during training. In our experiments, the addition of noise causes the real data to comprise a larger region of the output domain which causes the discriminator to less strict allowing for the generator to explore more without being penalized as severely. In practice, gradually decreasing this noise once all modes have been discovered can produce a strong generator that can produce high quality samples at every mode.
+
+The other set of experiments looked at how the concentration of modes and their arrangement impact the effects of packing. On a low density distribution with 9 modes and $\Sigma = 0.0025 \cdot \mathcal{I}$ (Figure 4 and Table 6), the standard GAN produces only 8 modes however when packing is added the network quickly discovers all 9 in only 4 epochs when $m=2$. This observation tells us that the non-packing network quickly converges to 8 modes and stops exploring the rest of the output manifold in order to focus on improving the quality of the modes it has already discovered. When packing is added this bottleneck is overcome immediately and the network can discover the final center mode. On a high density distribution with 81 modes and $\Sigma = 0.0025 \cdot \mathcal{I}$ (Figure 5 and Table 7), none of the three networkdsare able to discover all of the modes. The standard network finds 59 modes and packing with $m=2$ is slightly worse with 58 however packing with $m=3$ clearly outperforms the others discovering 69 of the 81 modes. It is clear that the architecture used in the experiments is not deep enough to learn this complex distribution adequately however we can still observe how adding packing to any network can reduce the degree of mode collapse. The last experiment is on a baseline distribution with randomly dispered modes (Figure 6 and Table 8). Here we wish to observe how varying distances between modes impacts how the generator explores the data manifold for undiscovered modes. In all three networks, none were able to discover all 25 modes with all the networks discovering the same 20-21 modes. From the plots in Figure 6, we can see that none of the networks could discover the 3 modes in the center-left area of the plot. These modes are all have a relative larger distance from nearby modes making it likely that the network did not explore this area of the manifold since it deviates significantly compared to the other modes it has already discovered. This observation shows that the relative distance between modes in a distribution plays a large role in the generators capability of avoiding mode collapse which packing cannot alleviate on its own.
