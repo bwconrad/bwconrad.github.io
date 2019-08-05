@@ -7,7 +7,7 @@ title: Ben Conrad
 
 BSc Computer Science from Simon Fraser University. Former NSERC Undergraduate Research Assistant at Simon Fraser University. 
 
-Currently researching generative models and computer vision.
+Interested in artificial intelligence, computer vision and data science.
 
 <div class="pagination">
   {% if site.owner.linkedin %}
